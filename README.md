@@ -1,8 +1,8 @@
-=Wait for it=
+# Wait for it
 
-wait-for-it.sh is a pure bash script that wait on the availability of a host and TCP port.  It is useful for synchronizing the spin-up of interdependent services, such as linked docker containers.  Since it is a pure bash script, it does not have any external dependencies.
+`wait-for-it.sh` is a pure bash script that wait on the availability of a host and TCP port.  It is useful for synchronizing the spin-up of interdependent services, such as linked docker containers.  Since it is a pure bash script, it does not have any external dependencies.
 
-==Usage==
+## Usage
 
 ```
 wait-for-it.sh host:port [-s] [-t timeout] [-- command args]
@@ -16,9 +16,9 @@ wait-for-it.sh host:port [-s] [-t timeout] [-- command args]
 -- COMMAND ARGS             Execute command with args after the test finishes
 ```
 
-==Examples==
+## Examples
 
-For example, let's test to see if we can access port 80 on www.google.com, and if it is available, echo the message "Let's start googling!"
+For example, let's test to see if we can access port 80 on www.google.com, and if it is available, echo the message `google is up`.
 
 ```
 $ ./wait-for-it.sh www.google.com:80 -- echo "google is up"
