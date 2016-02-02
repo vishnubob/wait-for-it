@@ -1,4 +1,4 @@
-`wait-for-it.sh` is a pure bash script that wait on the availability of a host and TCP port.  It is useful for synchronizing the spin-up of interdependent services, such as linked docker containers.  Since it is a pure bash script, it does not have any external dependencies.
+`wait-for-it.sh` is a pure bash script that will wait on the availability of a host and TCP port.  It is useful for synchronizing the spin-up of interdependent services, such as linked docker containers.  Since it is a pure bash script, it does not have any external dependencies.
 
 ## Usage
 
@@ -34,7 +34,7 @@ wait-for-it.sh: www.google.com:80 is available after 0 seconds
 google is up
 ```
 
-The subcommand will be executed regardless if the service is up or not.  If you wish to only execute the subcommand only if the service is up, add the `--strict` argument. In this example, we will test port 81 on www.google.com which will fail:
+The subcommand will be executed regardless if the service is up or not.  If you wish to execute the subcommand only if the service is up, add the `--strict` argument. In this example, we will test port 81 on www.google.com which will fail:
 
 ```
 $ ./wait-for-it.sh www.google.com:81 --timeout=1 --strict -- echo "google is up"
