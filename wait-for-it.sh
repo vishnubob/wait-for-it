@@ -63,7 +63,7 @@ wait_for_wrapper()
 }
 
 # process arguments
-while [[ $# -ne 0 ]]
+while [[ $# -gt 0 ]]
 do
     case "$1" in
         *:* ) 
@@ -86,6 +86,7 @@ do
         ;;
         -h) 
         HOST="$2"
+        if [[ $HOST == "" ]]; then break; fi
         shift 2
         ;;
         --host=*) 
@@ -94,6 +95,7 @@ do
         ;;
         -p)
         PORT="$2"
+        if [[ $PORT == "" ]]; then break; fi
         shift 2
         ;;
         --port=*)
@@ -102,6 +104,7 @@ do
         ;;
         -t)
         TIMEOUT="$2"
+        if [[ $TIMEOUT == "" ]]; then break; fi
         shift 2
         ;;
         --timeout=*)
