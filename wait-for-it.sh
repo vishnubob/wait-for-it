@@ -66,7 +66,7 @@ wait_for_wrapper()
 while [[ $# -gt 0 ]]
 do
     case "$1" in
-        *:* ) 
+        *:* )
         hostport=(${1//:/ })
         HOST=${hostport[0]}
         PORT=${hostport[1]}
@@ -84,12 +84,12 @@ do
         STRICT=1
         shift 1
         ;;
-        -h) 
+        -h)
         HOST="$2"
         if [[ $HOST == "" ]]; then break; fi
         shift 2
         ;;
-        --host=*) 
+        --host=*)
         HOST="${1#*=}"
         shift 1
         ;;
@@ -137,14 +137,16 @@ CHILD=${CHILD:-0}
 QUIET=${QUIET:-0}
 
 if [[ $CHILD -gt 0 ]]; then
-    RESULT=$(wait_for)
+    wait_for
+    RESULT=$?
     exit $RESULT
 else
     if [[ $TIMEOUT -gt 0 ]]; then
         wait_for_wrapper
         RESULT=$?
     else
-        RESULT=$(wait_for)
+        wait_for
+        RESULT=$?
     fi
 fi
 
