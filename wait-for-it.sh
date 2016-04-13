@@ -25,18 +25,18 @@ USAGE
 wait_for()
 {
     if [[ $TIMEOUT -gt 0 ]]; then
-        echoerr "$cmdname: waiting $TIMEOUT seconds for $HOST:$PORT"
+        echoerr "$cmdname: waiting $TIMEOUT seconds for $HOST:$WAIT_PORT"
     else
-        echoerr "$cmdname: waiting for $HOST:$PORT without a timeout"
+        echoerr "$cmdname: waiting for $HOST:$WAIT_PORT without a timeout"
     fi
     start_ts=$(date +%s)
     while :
     do
-        (echo > /dev/tcp/$HOST/$PORT) >/dev/null 2>&1
+        (echo > /dev/tcp/$HOST/$WAIT_PORT) >/dev/null 2>&1
         result=$?
         if [[ $result -eq 0 ]]; then
             end_ts=$(date +%s)
-            echoerr "$cmdname: $HOST:$PORT is available after $((end_ts - start_ts)) seconds"
+            echoerr "$cmdname: $HOST:$WAIT_PORT is available after $((end_ts - start_ts)) seconds"
             break
         fi
         sleep 1
@@ -48,16 +48,16 @@ wait_for_wrapper()
 {
     # In order to support SIGINT during timeout: http://unix.stackexchange.com/a/57692
     if [[ $QUIET -eq 1 ]]; then
-        timeout $TIMEOUT $0 --quiet --child --host=$HOST --port=$PORT --timeout=$TIMEOUT &
+        timeout $TIMEOUT $0 --quiet --child --host=$HOST --port=$WAIT_PORT --timeout=$TIMEOUT &
     else
-        timeout $TIMEOUT $0 --child --host=$HOST --port=$PORT --timeout=$TIMEOUT &
+        timeout $TIMEOUT $0 --child --host=$HOST --port=$WAIT_PORT --timeout=$TIMEOUT &
     fi
     PID=$!
     trap "kill -INT -$PID" INT
     wait $PID
     RESULT=$?
     if [[ $RESULT -ne 0 ]]; then
-        echoerr "$cmdname: timeout occurred after waiting $TIMEOUT seconds for $HOST:$PORT"
+        echoerr "$cmdname: timeout occurred after waiting $TIMEOUT seconds for $HOST:$WAIT_PORT"
     fi
     return $RESULT
 }
@@ -69,7 +69,7 @@ do
         *:* )
         hostport=(${1//:/ })
         HOST=${hostport[0]}
-        PORT=${hostport[1]}
+        WAIT_PORT=${hostport[1]}
         shift 1
         ;;
         --child)
@@ -94,12 +94,12 @@ do
         shift 1
         ;;
         -p)
-        PORT="$2"
-        if [[ $PORT == "" ]]; then break; fi
+        WAIT_PORT="$2"
+        if [[ $WAIT_PORT == "" ]]; then break; fi
         shift 2
         ;;
         --port=*)
-        PORT="${1#*=}"
+        WAIT_PORT="${1#*=}"
         shift 1
         ;;
         -t)
@@ -126,7 +126,7 @@ do
     esac
 done
 
-if [[ "$HOST" == "" || "$PORT" == "" ]]; then
+if [[ "$HOST" == "" || "$WAIT_PORT" == "" ]]; then
     echoerr "Error: you need to provide a host and port to test."
     usage
 fi
