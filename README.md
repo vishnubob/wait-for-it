@@ -28,7 +28,7 @@ google is up
 You can set your own timeout with the `-t` or `--timeout=` option.  Setting the timeout value to 0 will disable the timeout:
 
 ```
-$ ./wait-for-it.sh -t 0 www.google.com:80 -- echo "google is up"
+$ ./wait-for-it.sh www.google.com:80 -t 0 -- echo "google is up"
 wait-for-it.sh: waiting for www.google.com:80 without a timeout
 wait-for-it.sh: www.google.com:80 is available after 0 seconds
 google is up
