@@ -4,14 +4,17 @@
 
 ```
 wait-for-it.sh host:port [-s] [-t timeout] [-- command args]
--h HOST | --host=HOST       Host or IP under test
--p PORT | --port=PORT       TCP port under test
-                            Alternatively, you specify the host and port as host:port
--s | --strict               Only execute subcommand if the test succeeds
--q | --quiet                Don't output any status messages
--t TIMEOUT | --timeout=TIMEOUT
-                            Timeout in seconds, zero for no timeout
--- COMMAND ARGS             Execute command with args after the test finishes
+    -h HOST | --host=HOST       Host or IP under test
+    -p PORT | --port=PORT       TCP port under test
+                                Alternatively, you specify the host and port as host:port
+    -b | --busybox              Use busybox timeout command, i.e. timeout needs -t flag
+    -w | --wget                 Use wget command to check http endpoints
+    -c | --curl                 Use curl command to check http endpoints
+    -s | --strict               Only execute subcommand if the test succeeds
+    -q | --quiet                Do not output any status messages
+    -t TIMEOUT | --timeout=TIMEOUT
+                                Timeout in seconds, zero for no timeout
+    -- COMMAND ARGS             Execute command with args after the test finishes
 ```
 
 ## Examples
@@ -23,6 +26,12 @@ $ ./wait-for-it.sh www.google.com:80 -- echo "google is up"
 wait-for-it.sh: waiting 15 seconds for www.google.com:80
 wait-for-it.sh: www.google.com:80 is available after 0 seconds
 google is up
+```
+
+With the default args, you are just checking at the TCP level.  If you wanted to check that google is up and responding with a successful HTTP status code, you could use the `--curl` or `--wget` switches (assumes the respective `curl` or `wget` command is available on your system).  :
+
+```
+./wait-for-it.sh --curl www.google.com:80 -- echo "google is up"
 ```
 
 You can set your own timeout with the `-t` or `--timeout=` option.  Setting the timeout value to 0 will disable the timeout:
