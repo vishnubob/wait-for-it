@@ -1,6 +1,6 @@
 # HELP NEEDED
 
-Hi there!  I wrote `wait-for-it` in order to help me orchestrate containers I operate at my day job.  I thought it was a neat little script, so I published it.  I assumed I would be its only user, but that's not what happened!  `wait-for-it` has received more stars then all of my other public repositories put together.  I had no idea this tool would solict such an audience, and I was equally unprepared to carve out the time required to address my user's issues and patches.  I've been thinking a lot about how I want to handle this, and I've decided that I would like to solicit a volunteer from the community who would be willing to be a co-maintainer of this repository.  If this is something you might be interested in, please email me at `waitforit@polymerase.org`.  Thanks!
+Hi there!  I wrote `wait-for-it` in order to help me orchestrate containers I operate at my day job.  I thought it was a neat little script, so I published it.  I assumed I would be its only user, but that's not what happened!  `wait-for-it` has received more stars then all of my other public repositories put together.  I had no idea this tool would solicit such an audience, and I was equally unprepared to carve out the time required to address my user's issues and patches.  I would like to solicit a volunteer from the community who would be willing to be a co-maintainer of this repository.  If this is something you might be interested in, please email me at `waitforit@polymerase.org`.  Thanks!
 
 ## wait-for-it
 
