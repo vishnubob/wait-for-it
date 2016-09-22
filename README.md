@@ -66,4 +66,4 @@ $ echo $?
 
 ## Thanks
 
-I wrote this script for my employer, [Ginkgo Bioworks](http://www.ginkgobioworks.com/), who was kind enough to let me release it as an open source tool.  We are always looking to hire talented folks who are interested in working in the field of synthetic biology.
+I wrote this script for my employer, [Ginkgo Bioworks](http://www.ginkgobioworks.com/), who was kind enough to let me release it as an open source tool.  We are always looking to [hire](https://jobs.lever.co/ginkgobioworks) talented folks who are interested in working in the field of synthetic biology.
