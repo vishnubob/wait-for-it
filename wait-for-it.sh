@@ -12,7 +12,8 @@ Usage:
     $cmdname host:port [-s] [-t timeout] [-- command args]
     -h HOST | --host=HOST       Host or IP under test
     -p PORT | --port=PORT       TCP port under test
-                                Alternatively, you specify the host and port as host:port
+                                Alternatively, you specify the host and port as host:port,
+                                multiple parameters allowed
     -s | --strict               Only execute subcommand if the test succeeds
     -q | --quiet                Don't output any status messages
     -t TIMEOUT | --timeout=TIMEOUT
@@ -62,14 +63,19 @@ wait_for_wrapper()
     return $RESULT
 }
 
+declare -a HOSTS
+declare -a PORTS
+I=0
+
 # process arguments
 while [[ $# -gt 0 ]]
 do
     case "$1" in
         *:* )
         hostport=(${1//:/ })
-        HOST=${hostport[0]}
-        PORT=${hostport[1]}
+        I=$((I + 1))
+        HOSTS[I]=${hostport[0]}
+        PORTS[I]=${hostport[1]}
         shift 1
         ;;
         --child)
@@ -85,21 +91,21 @@ do
         shift 1
         ;;
         -h)
-        HOST="$2"
-        if [[ $HOST == "" ]]; then break; fi
+        HOSTS[0]="$2"
+        if [[ $HOSTS[0] == "" ]]; then break; fi
         shift 2
         ;;
         --host=*)
-        HOST="${1#*=}"
+        HOSTS[0]="${1#*=}"
         shift 1
         ;;
         -p)
-        PORT="$2"
-        if [[ $PORT == "" ]]; then break; fi
+        PORTS[0]="$2"
+        if [[ $PORTS[0] == "" ]]; then break; fi
         shift 2
         ;;
         --port=*)
-        PORT="${1#*=}"
+        PORTS[0]="${1#*=}"
         shift 1
         ;;
         -t)
@@ -126,8 +132,8 @@ do
     esac
 done
 
-if [[ "$HOST" == "" || "$PORT" == "" ]]; then
-    echoerr "Error: you need to provide a host and port to test."
+if [[ "${#HOSTS[*]}" == "0" || "${#PORTS[*]}" == "0" ]]; then
+    echoerr "Error: you need to provide at least one host and port to test."
     usage
 fi
 
@@ -137,15 +143,27 @@ CHILD=${CHILD:-0}
 QUIET=${QUIET:-0}
 
 if [[ $CHILD -gt 0 ]]; then
-    wait_for
+    for i in "${!HOSTS[@]}"; do
+        HOST=${HOSTS[$i]}
+        PORT=${PORTS[$i]}
+        wait_for
+    done
     RESULT=$?
     exit $RESULT
 else
     if [[ $TIMEOUT -gt 0 ]]; then
-        wait_for_wrapper
+        for i in "${!HOSTS[@]}"; do
+            HOST=${HOSTS[$i]}
+            PORT=${PORTS[$i]}
+            wait_for_wrapper
+        done
         RESULT=$?
     else
-        wait_for
+        for i in "${!HOSTS[@]}"; do
+            HOST=${HOSTS[$i]}
+            PORT=${PORTS[$i]}
+            wait_for
+        done
         RESULT=$?
     fi
 fi
