@@ -9,12 +9,14 @@ usage()
 {
     cat << USAGE >&2
 Usage:
-    $cmdname host:port [-s] [-t timeout] [-- command args]
+    $cmdname host:port [-c endpoint] [-s] [-t timeout] [-- command args]
     -h HOST | --host=HOST       Host or IP under test
     -p PORT | --port=PORT       TCP port under test
                                 Alternatively, you specify the host and port as host:port
+    -c ENDPOINT | --curl=ENDPOINT
+                                Endpoint to curl: if provided, host and port ignored
     -s | --strict               Only execute subcommand if the test succeeds
-    -q | --quiet                Don't output any status messages
+    -q | --quiet                Dont output any status messages
     -t TIMEOUT | --timeout=TIMEOUT
                                 Timeout in seconds, zero for no timeout
     -- COMMAND ARGS             Execute command with args after the test finishes
@@ -25,18 +27,23 @@ USAGE
 wait_for()
 {
     if [[ $TIMEOUT -gt 0 ]]; then
-        echoerr "$cmdname: waiting $TIMEOUT seconds for $HOST:$PORT"
+        echoerr "$cmdname: waiting $TIMEOUT seconds for $IT"
     else
-        echoerr "$cmdname: waiting for $HOST:$PORT without a timeout"
+        echoerr "$cmdname: waiting for $IT without a timeout"
     fi
     start_ts=$(date +%s)
     while :
     do
-        (echo > /dev/tcp/$HOST/$PORT) >/dev/null 2>&1
+        if [[ $ENDPOINT != "" ]]; then
+            curl --silent --head --location --output /dev/null --write-out '%{http_code}' $ENDPOINT | grep '^2' >/dev/null
+        else
+            (echo > /dev/tcp/$HOST/$PORT) >/dev/null 2>&1
+        fi
+
         result=$?
         if [[ $result -eq 0 ]]; then
             end_ts=$(date +%s)
-            echoerr "$cmdname: $HOST:$PORT is available after $((end_ts - start_ts)) seconds"
+            echoerr "$cmdname: $IT is available after $((end_ts - start_ts)) seconds"
             break
         fi
         sleep 1
@@ -44,20 +51,36 @@ wait_for()
     return $result
 }
 
+create_child() { 
+    if hash timeout 2>/dev/null; then
+        timeout "$@"
+    else
+        perl -e 'alarm shift; exec @ARGV' "$@";
+    fi
+}
+
 wait_for_wrapper()
 {
     # In order to support SIGINT during timeout: http://unix.stackexchange.com/a/57692
-    if [[ $QUIET -eq 1 ]]; then
-        timeout $TIMEOUT $0 --quiet --child --host=$HOST --port=$PORT --timeout=$TIMEOUT &
-    else
-        timeout $TIMEOUT $0 --child --host=$HOST --port=$PORT --timeout=$TIMEOUT &
+    if [[ $ENDPOINT != "" ]]; then
+        if [[ $QUIET -eq 1 ]]; then
+            create_child $TIMEOUT $0 --quiet --child --curl="$ENDPOINT" --timeout=$TIMEOUT &
+        else
+            create_child $TIMEOUT $0 --child --curl="$ENDPOINT" --timeout=$TIMEOUT &
+        fi
+    else 
+        if [[ $QUIET -eq 1 ]]; then
+            create_child $TIMEOUT $0 --quiet --child --host=$HOST --port=$PORT --timeout=$TIMEOUT &
+        else
+            create_child $TIMEOUT $0 --child --host=$HOST --port=$PORT --timeout=$TIMEOUT &
+        fi
     fi
     PID=$!
     trap "kill -INT -$PID" INT
     wait $PID
     RESULT=$?
     if [[ $RESULT -ne 0 ]]; then
-        echoerr "$cmdname: timeout occurred after waiting $TIMEOUT seconds for $HOST:$PORT"
+        echoerr "$cmdname: timeout occurred after waiting $TIMEOUT seconds for $IT"
     fi
     return $RESULT
 }
@@ -66,10 +89,12 @@ wait_for_wrapper()
 while [[ $# -gt 0 ]]
 do
     case "$1" in
-        *:* )
-        hostport=(${1//:/ })
-        HOST=${hostport[0]}
-        PORT=${hostport[1]}
+        -c)
+        ENDPOINT="$2"
+        shift 2
+        ;;
+        --curl=*)
+        ENDPOINT="${1#*=}"
         shift 1
         ;;
         --child)
@@ -119,6 +144,12 @@ do
         --help)
         usage
         ;;
+        *:* )
+        hostport=(${1//:/ })
+        HOST=${hostport[0]}
+        PORT=${hostport[1]}
+        shift 1
+        ;;
         *)
         echoerr "Unknown argument: $1"
         usage
@@ -126,8 +157,12 @@ do
     esac
 done
 
-if [[ "$HOST" == "" || "$PORT" == "" ]]; then
-    echoerr "Error: you need to provide a host and port to test."
+if [[ "$ENDPOINT" != "" ]]; then
+    IT="$ENDPOINT"
+elif  [[ "$HOST" != "" && "$PORT" != "" ]]; then
+    IT="$HOST:$PORT"
+else
+    echoerr "Error: you need to provide a host and port or curl command to test."
     usage
 fi
 
