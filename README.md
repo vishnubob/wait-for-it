@@ -2,7 +2,7 @@
 
 ### March 13, 2017 update
 
-Since I posted this request for help, I've had a dozen or so responses which I am now sorting through.  Applicants need to fill out [this](https://goo.gl/forms/GKCBFxaloaU47aky1) survey by March 17th.  I will select, notify and announce the new volunteer(s) on March 19th.  Once this is done, me and my team will work through the backlog of issues amd pull requests.  Thank you for your paitence, more updates to come as scheduled.
+Since I posted this request for help, I've had a dozen or so responses which I am now sorting through.  Applicants need to fill out [this](https://goo.gl/forms/GKCBFxaloaU47aky1) survey by March 17th.  I will select, notify and announce the new volunteer(s) on March 19th.  Once this is done, me and my team will work through the backlog of issues amd pull requests.  Thanks for your paitence.
 
 ### Old request follows:
 
