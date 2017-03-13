@@ -2,7 +2,7 @@
 
 ### March 13, 2017 update
 
-Since I posted this request for help, I've had a dozen or so responses which I am now sorting through.  Applicants are filling out a google form to help me pick the best volunteer for this project.  I have set a deadline of Match 17th for survey submissions, and will select a volunteer on March 19th.  Once this is done, and the repo is configured, we will tagteam through the backlog of issues amd pull requests.  I realized it's been frustrating, and many different forks of this project have sprung up.  I think that's awesome, and I look forward to working and consolidating the various enhancements.  If you are interested in helping, please fill out this (survey)[https://goo.gl/forms/GKCBFxaloaU47aky1] no later then March 17th.  Thanks!
+Since I posted this request for help, I've had a dozen or so responses which I am now sorting through.  Applicants are filling out a google form to help me pick the best volunteer for this project.  I have set a deadline of Match 17th for survey submissions, and will select a volunteer on March 19th.  Once this is done, and the repo is configured, we will tagteam through the backlog of issues amd pull requests.  I realized it's been frustrating, and many different forks of this project have sprung up.  I think that's awesome, and I look forward to working and consolidating the various enhancements.  If you are interested in helping, please fill out this [survey](https://goo.gl/forms/GKCBFxaloaU47aky1) no later then March 17th.  Thanks!
 
 ### Old request follows:
 
