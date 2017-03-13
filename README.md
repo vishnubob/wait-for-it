@@ -1,5 +1,11 @@
 # HELP NEEDED
 
+### March 13, 2017 update
+
+Since I posted this request for help, I've had a dozen or so responses which I am now sorting through.  Applicants are filling out a google form to help me pick the best volunteer for this project.  I have set a deadline of Match 17th for survey submissions, and will select a volunteer on March 19th.  Once this is done, and the repo is configured, we will tagteam through the backlog of issues amd pull requests.  I realized it's been frustrating, and many different forks of this project have sprung up.  I think that's awesome, and I look forward to working and consolidating the various enhancements.  If you are interested in helping, please fill out this (survey)[https://goo.gl/forms/GKCBFxaloaU47aky1] no later then March 17th.  Thanks!
+
+### Old request follows:
+
 Hi there!  I wrote `wait-for-it` in order to help me orchestrate containers I operate at my day job.  I thought it was a neat little script, so I published it.  I assumed I would be its only user, but that's not what happened!  `wait-for-it` has received more stars then all of my other public repositories put together.  I had no idea this tool would solicit such an audience, and I was equally unprepared to carve out the time required to address my user's issues and patches.  I would like to solicit a volunteer from the community who would be willing to be a co-maintainer of this repository.  If this is something you might be interested in, please email me at `waitforit@polymerase.org`.  Thanks!
 
 ## wait-for-it
