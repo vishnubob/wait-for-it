@@ -28,6 +28,7 @@ class TestWaitForIt(unittest.TestCase):
         self.assertEqual(exitcode,1)        
         
     def test_help(self):
+        # Execute with "--help" option and check output
         exitcode, out, err = self.execute(self.wait_script+" --help")
         # STDERR should begin with "Usage:"
         self.assertTrue(err.startswith("Usage:"))
