@@ -10,12 +10,12 @@ usage()
     cat << USAGE >&2
 Usage:
     $cmdname host:port [-s] [-t timeout] [-- command args]
-    -h HOST | --host=HOST       Host or IP under test
-    -p PORT | --port=PORT       TCP port under test
+    -h WAITFORIT_HOST | --host=WAITFORIT_HOST       Host or IP under test
+    -p WAITFORIT_PORT | --port=WAITFORIT_PORT       TCP port under test
                                 Alternatively, you specify the host and port as host:port
     -s | --strict               Only execute subcommand if the test succeeds
     -q | --quiet                Don't output any status messages
-    -t TIMEOUT | --timeout=TIMEOUT
+    -t WAITFORIT_TIMEOUT | --timeout=WAITFORIT_TIMEOUT
                                 Timeout in seconds, zero for no timeout
     -- COMMAND ARGS             Execute command with args after the test finishes
 USAGE
@@ -24,19 +24,19 @@ USAGE
 
 wait_for()
 {
-    if [[ $TIMEOUT -gt 0 ]]; then
-        echoerr "$cmdname: waiting $TIMEOUT seconds for $HOST:$PORT"
+    if [[ $WAITFORIT_TIMEOUT -gt 0 ]]; then
+        echoerr "$cmdname: waiting $WAITFORIT_TIMEOUT seconds for $WAITFORIT_HOST:$WAITFORIT_PORT"
     else
-        echoerr "$cmdname: waiting for $HOST:$PORT without a timeout"
+        echoerr "$cmdname: waiting for $WAITFORIT_HOST:$WAITFORIT_PORT without a timeout"
     fi
     start_ts=$(date +%s)
     while :
     do
-        (echo > /dev/tcp/$HOST/$PORT) >/dev/null 2>&1
+        (echo > /dev/tcp/$WAITFORIT_HOST/$WAITFORIT_PORT) >/dev/null 2>&1
         result=$?
         if [[ $result -eq 0 ]]; then
             end_ts=$(date +%s)
-            echoerr "$cmdname: $HOST:$PORT is available after $((end_ts - start_ts)) seconds"
+            echoerr "$cmdname: $WAITFORIT_HOST:$WAITFORIT_PORT is available after $((end_ts - start_ts)) seconds"
             break
         fi
         sleep 1
@@ -48,16 +48,16 @@ wait_for_wrapper()
 {
     # In order to support SIGINT during timeout: http://unix.stackexchange.com/a/57692
     if [[ $QUIET -eq 1 ]]; then
-        timeout $TIMEOUT $0 --quiet --child --host=$HOST --port=$PORT --timeout=$TIMEOUT &
+        timeout $WAITFORIT_TIMEOUT $0 --quiet --child --host=$WAITFORIT_HOST --port=$WAITFORIT_PORT --timeout=$WAITFORIT_TIMEOUT &
     else
-        timeout $TIMEOUT $0 --child --host=$HOST --port=$PORT --timeout=$TIMEOUT &
+        timeout $WAITFORIT_TIMEOUT $0 --child --host=$WAITFORIT_HOST --port=$WAITFORIT_PORT --timeout=$WAITFORIT_TIMEOUT &
     fi
     PID=$!
     trap "kill -INT -$PID" INT
     wait $PID
     RESULT=$?
     if [[ $RESULT -ne 0 ]]; then
-        echoerr "$cmdname: timeout occurred after waiting $TIMEOUT seconds for $HOST:$PORT"
+        echoerr "$cmdname: timeout occurred after waiting $WAITFORIT_TIMEOUT seconds for $WAITFORIT_HOST:$WAITFORIT_PORT"
     fi
     return $RESULT
 }
@@ -68,8 +68,8 @@ do
     case "$1" in
         *:* )
         hostport=(${1//:/ })
-        HOST=${hostport[0]}
-        PORT=${hostport[1]}
+        WAITFORIT_HOST=${hostport[0]}
+        WAITFORIT_PORT=${hostport[1]}
         shift 1
         ;;
         --child)
@@ -85,30 +85,30 @@ do
         shift 1
         ;;
         -h)
-        HOST="$2"
-        if [[ $HOST == "" ]]; then break; fi
+        WAITFORIT_HOST="$2"
+        if [[ $WAITFORIT_HOST == "" ]]; then break; fi
         shift 2
         ;;
         --host=*)
-        HOST="${1#*=}"
+        WAITFORIT_HOST="${1#*=}"
         shift 1
         ;;
         -p)
-        PORT="$2"
-        if [[ $PORT == "" ]]; then break; fi
+        WAITFORIT_PORT="$2"
+        if [[ $WAITFORIT_PORT == "" ]]; then break; fi
         shift 2
         ;;
         --port=*)
-        PORT="${1#*=}"
+        WAITFORIT_PORT="${1#*=}"
         shift 1
         ;;
         -t)
-        TIMEOUT="$2"
-        if [[ $TIMEOUT == "" ]]; then break; fi
+        WAITFORIT_TIMEOUT="$2"
+        if [[ $WAITFORIT_TIMEOUT == "" ]]; then break; fi
         shift 2
         ;;
         --timeout=*)
-        TIMEOUT="${1#*=}"
+        WAITFORIT_TIMEOUT="${1#*=}"
         shift 1
         ;;
         --)
@@ -126,12 +126,12 @@ do
     esac
 done
 
-if [[ "$HOST" == "" || "$PORT" == "" ]]; then
+if [[ "$WAITFORIT_HOST" == "" || "$WAITFORIT_PORT" == "" ]]; then
     echoerr "Error: you need to provide a host and port to test."
     usage
 fi
 
-TIMEOUT=${TIMEOUT:-15}
+WAITFORIT_TIMEOUT=${WAITFORIT_TIMEOUT:-15}
 STRICT=${STRICT:-0}
 CHILD=${CHILD:-0}
 QUIET=${QUIET:-0}
@@ -141,7 +141,7 @@ if [[ $CHILD -gt 0 ]]; then
     RESULT=$?
     exit $RESULT
 else
-    if [[ $TIMEOUT -gt 0 ]]; then
+    if [[ $WAITFORIT_TIMEOUT -gt 0 ]]; then
         wait_for_wrapper
         RESULT=$?
     else
