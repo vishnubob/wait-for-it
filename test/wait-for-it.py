@@ -7,9 +7,10 @@ import sys
 import socket
 import re
 
-missing_args_text = "Error: you need to provide a host and port to test."
-help_text = "Usage:"
-dividing_line = '-'*71 # Output line of dashes
+MISSING_ARGS_TEXT = "Error: you need to provide a host and port to test."
+HELP_TEXT = "Usage:"  # Start of help text
+DIVIDE_LINE = '-'*71  # Output line of dashes
+
 """
     TestWaitForIt tests the wait-for-it.sh shell script.
     
@@ -34,21 +35,21 @@ class TestWaitForIt(unittest.TestCase):
         return s
     
     def check_args(self,args,stdout_regex,stderr_regex,exitcode):
-        command = self.wait_script+" "+args
+        command = self.wait_script + " " + args
         actual_exitcode, out, err = self.execute(command)
         
         # Check stderr
         msg = ("Failed check that STDERR:\n"+
-              dividing_line + "\n"+err+"\n"+dividing_line+
-              "\nmatches:\n"+
-              dividing_line + "\n"+stderr_regex+"\n"+dividing_line)
+              DIVIDE_LINE + "\n" + err + "\n" + DIVIDE_LINE +
+              "\nmatches:\n" +
+              DIVIDE_LINE + "\n" + stderr_regex + "\n" + DIVIDE_LINE)
         self.assertIsNotNone(re.match(stderr_regex,err,re.DOTALL),msg)
         
         # Check STDOUT        
         msg = ("Failed check that STDOUT:\n"+
-               dividing_line + "\n"+out+"\n"+dividing_line+
-               "\nmatches:\n"+
-               dividing_line + "\n"+stdout_regex+"\n"+dividing_line)
+               DIVIDE_LINE + "\n" + out + "\n" + DIVIDE_LINE +
+               "\nmatches:\n" +
+               DIVIDE_LINE + "\n" + stdout_regex + "\n" + DIVIDE_LINE)
         self.assertIsNotNone(re.match(stdout_regex,out,re.DOTALL),msg)
 
         # Check exit code
@@ -67,7 +68,7 @@ class TestWaitForIt(unittest.TestCase):
         self.check_args(
             "",
             "^$",
-            missing_args_text,
+            MISSING_ARGS_TEXT,
             1
         )
         # Return code should be 1 when called with no args
@@ -79,7 +80,7 @@ class TestWaitForIt(unittest.TestCase):
          self.check_args(
             "--help",
             "",
-            help_text,
+            HELP_TEXT,
             1
         )
 
@@ -88,7 +89,7 @@ class TestWaitForIt(unittest.TestCase):
         self.check_args(
             "--host=localhost",
             "",
-            missing_args_text,
+            MISSING_ARGS_TEXT,
             1
         )
 
@@ -97,7 +98,7 @@ class TestWaitForIt(unittest.TestCase):
         self.check_args(
             "--port=80",
             "",
-            missing_args_text,
+            MISSING_ARGS_TEXT,
             1
         )
 
