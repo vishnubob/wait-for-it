@@ -160,7 +160,7 @@ class TestWaitForIt(unittest.TestCase):
         self.check_args(
             "localhost:8929 -- ls not_real_file",
             "",
-           ".*ls: cannot access 'not_real_file': No such file or directory\n",
+           ".*No such file or directory\n",
             2
         )
         soc.close()
