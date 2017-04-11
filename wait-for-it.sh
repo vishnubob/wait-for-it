@@ -46,12 +46,21 @@ wait_for()
 
 wait_for_wrapper()
 {
-    # In order to support SIGINT during timeout: http://unix.stackexchange.com/a/57692
     if [[ $QUIET -eq 1 ]]; then
-        timeout $TIMEOUT $0 --quiet --child --host=$HOST --port=$PORT --timeout=$TIMEOUT &
+        QUIET_OPTION="--quiet"
     else
-        timeout $TIMEOUT $0 --child --host=$HOST --port=$PORT --timeout=$TIMEOUT &
+        QUIET_OPTION=""
     fi
+    ls -l `which timeout` | grep busybox > /dev/null
+    if [[ $? -eq 0 ]]; then
+        # echo $cmdname: using busybox timeout
+        TIMEOUT_OPTION="-t $TIMEOUT"
+    else
+        # echo $cmdname: using native timeout
+        TIMEOUT_OPTION="$TIMEOUT"
+    fi   
+    # In order to support SIGINT during timeout: http://unix.stackexchange.com/a/57692
+    timeout $TIMEOUT_OPTION $0 $QUIET_OPTION --child --host=$HOST --port=$PORT &
     PID=$!
     trap "kill -INT -$PID" INT
     wait $PID
