@@ -126,6 +126,10 @@ do
     esac
 done
 
+HOST=$(eval echo $HOST)
+PORT=$(eval echo $PORT)
+TIMEOUT=$(eval echo $TIMEOUT)
+
 if [[ "$HOST" == "" || "$PORT" == "" ]]; then
     echoerr "Error: you need to provide a host and port to test."
     usage
