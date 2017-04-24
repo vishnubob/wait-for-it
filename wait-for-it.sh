@@ -17,6 +17,7 @@ Usage:
     -q | --quiet                Don't output any status messages
     -t TIMEOUT | --timeout=TIMEOUT
                                 Timeout in seconds, zero for no timeout
+    -c COMMAND-ARG              Command arg (multiple -c allowed)
     -- COMMAND ARGS             Execute command with args after the test finishes
 USAGE
     exit 1
@@ -110,6 +111,10 @@ do
         --timeout=*)
         TIMEOUT="${1#*=}"
         shift 1
+        ;;
+        -c)
+        CLI="$CLI $2"
+        shift 2
         ;;
         --)
         shift
