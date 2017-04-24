@@ -21,6 +21,8 @@ wait-for-it.sh host:port [-s] [-t timeout] [-- command args]
                             Alternatively, you specify the host and port as host:port
 -s | --strict               Only execute subcommand if the test succeeds
 -q | --quiet                Don't output any status messages
+--arg=NAME VALUE            Define arbitrary environment var <NAME> = VALUE
+--check HEALTH-CHECK-ARG    External health check definition (multiple --check allowed)
 -t TIMEOUT | --timeout=TIMEOUT
                             Timeout in seconds, zero for no timeout
 -- COMMAND ARGS             Execute command with args after the test finishes
@@ -68,6 +70,25 @@ wait-for-it.sh: waiting 15 seconds for www.google.com:81
 wait-for-it.sh: timeout occurred after waiting 15 seconds for www.google.com:81
 $ echo $?
 124
+```
+
+### External Health Checks
+
+If you have a need to violate the purity of the bash-only solution, you can use the `--check` argument to build up a command line that will be used to check service availability.
+
+```
+./wait-for-it.sh --check 'nc -z $$HOST $$PORT' -c "echo" -c "google is up"
+```
+
+This can be extended into Docker containers via ENTRYPOINT/CMD settings, and provide a structure for defining a generalized healthcheck and allowing container-specific customizations via the CMD overrides.
+
+### Custom Environment Vars
+
+To help support configuration flexibility with custom healthcheck commands, definition of arbitrary environment vars on the ocmmand line is supported.
+This provides a way to define an argument to the healthcheck command from the command line and reduces complexity of external definition of environment variables.
+
+```
+./wait-for-it.sh --arg=HOSTNAME www.google.com --check 'nc -z $HOSTNAME $PORT' -c "echo" -c "google is up"
 ```
 
 ## Thanks
