@@ -23,6 +23,7 @@ wait-for-it.sh host:port [-s] [-t timeout] [-- command args]
 -q | --quiet                Don't output any status messages
 -t TIMEOUT | --timeout=TIMEOUT
                             Timeout in seconds, zero for no timeout
+-c COMMAND-ARG              Command argument (multiple -c allowed)
 -- COMMAND ARGS             Execute command with args after the test finishes
 ```
 
@@ -68,6 +69,14 @@ wait-for-it.sh: waiting 15 seconds for www.google.com:81
 wait-for-it.sh: timeout occurred after waiting 15 seconds for www.google.com:81
 $ echo $?
 124
+```
+
+If you are running inside Docker container, and want to lock down the command line while allowing configurability of the trigger port, use the `-c` options to specify the command line in the ENTRYPOINT.
+This way, you're not requiring (or allowing) the command line to be reconfigured in container configuration.
+
+```
+ENTRYPOINT [ "./wait-for-it.sh", "--strict", "-c", "echo", "-c", "google is up" ]
+CMD [ "www.google.com:80", "--timeout=1" ]
 ```
 
 ## Thanks
