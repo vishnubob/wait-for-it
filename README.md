@@ -1,13 +1,3 @@
-# HELP NEEDED
-
-### March 13, 2017 update
-
-Since I posted this request for help, I've had a dozen or so responses which I am now sorting through.  Applicants need to fill out [this](https://goo.gl/forms/GKCBFxaloaU47aky1) survey by March 17th.  I will select, notify and announce the new volunteer(s) on March 19th.  Once this is done, me and my team will work through the backlog of issues amd pull requests.  Thanks for your paitence.
-
-### Old request follows:
-
-Hi there!  I wrote `wait-for-it` in order to help me orchestrate containers I operate at my day job.  I thought it was a neat little script, so I published it.  I assumed I would be its only user, but that's not what happened!  `wait-for-it` has received more stars then all of my other public repositories put together.  I had no idea this tool would solicit such an audience, and I was equally unprepared to carve out the time required to address my user's issues and patches.  I would like to solicit a volunteer from the community who would be willing to be a co-maintainer of this repository.  If this is something you might be interested in, please email me at `waitforit@polymerase.org`.  Thanks!
-
 ## wait-for-it
 
 `wait-for-it.sh` is a pure bash script that will wait on the availability of a host and TCP port.  It is useful for synchronizing the spin-up of interdependent services, such as linked docker containers.  Since it is a pure bash script, it does not have any external dependencies.
@@ -70,6 +60,3 @@ $ echo $?
 124
 ```
 
-## Thanks
-
-I wrote this script for my employer, [Ginkgo Bioworks](http://www.ginkgobioworks.com/), who was kind enough to let me release it as an open source tool.  We are always looking to [hire](https://jobs.lever.co/ginkgobioworks) talented folks who are interested in working in the field of synthetic biology.
