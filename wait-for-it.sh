@@ -44,7 +44,23 @@ wait_for()
     return $result
 }
 
-wait_for_wrapper()
+wait_with_expect()
+{
+    # start the command in a subshell to avoid problem with pipes
+    # (spawn accepts one command)
+    [[ $QUIET -eq 1 ]] && QUIET_ARG="--quiet" || QUIET_ARG=""
+    command="/bin/sh -c \"$0 $QUIET_ARG --child --host=$HOST --port=$PORT --timeout=$TIMEOUT\""
+
+    expect -c "set echo \"-noecho\"; set timeout $TIMEOUT; spawn -noecho $command; expect timeout { exit 1 } eof { exit 0 }"
+    RESULT=$?
+
+    if [[ $RESULT -ne 0 ]]; then
+        echoerr "$cmdname: timeout occurred after waiting $TIMEOUT seconds for $HOST:$PORT"
+    fi
+    return $RESULT
+}
+
+wait_with_timeout()
 {
     # In order to support SIGINT during timeout: http://unix.stackexchange.com/a/57692
     if [[ $QUIET -eq 1 ]]; then
@@ -60,6 +76,18 @@ wait_for_wrapper()
         echoerr "$cmdname: timeout occurred after waiting $TIMEOUT seconds for $HOST:$PORT"
     fi
     return $RESULT
+}
+
+wait_for_wrapper()
+{
+    if type -P timeout &>/dev/null; then
+      wait_with_timeout
+    elif type -P expect &>/dev/null; then
+      wait_with_expect
+    else
+      echo >&2 echo "Neither timeout nor expect available."
+      exit 2;
+    fi
 }
 
 # process arguments
