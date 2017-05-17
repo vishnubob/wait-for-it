@@ -1,6 +1,18 @@
 #!/usr/bin/env bash
 #   Use this script to test if a given TCP host/port are available
 
+# OSX doesn't have the timeout command but it can be installed using homebrew.
+# Check if the gtimeout command exists and, if needed, tell the user how to
+# install it.
+timeout_cmd="timeout"
+if [ $(uname -s) = "Darwin" ]; then
+  timeout_cmd="gtimeout"
+  if ! which $timeout_cmd 2>&1 >/dev/null; then
+    echo "Can't find the command 'gtimeout'. Run 'brew install coreutils' to install it."
+    exit 1
+  fi
+fi
+
 cmdname=$(basename $0)
 
 echoerr() { if [[ $QUIET -ne 1 ]]; then echo "$@" 1>&2; fi }
@@ -48,9 +60,9 @@ wait_for_wrapper()
 {
     # In order to support SIGINT during timeout: http://unix.stackexchange.com/a/57692
     if [[ $QUIET -eq 1 ]]; then
-        timeout $TIMEOUT $0 --quiet --child --host=$HOST --port=$PORT --timeout=$TIMEOUT &
+        $timeout_cmd $TIMEOUT $0 --quiet --child --host=$HOST --port=$PORT --timeout=$TIMEOUT &
     else
-        timeout $TIMEOUT $0 --child --host=$HOST --port=$PORT --timeout=$TIMEOUT &
+        $timeout_cmd $TIMEOUT $0 --child --host=$HOST --port=$PORT --timeout=$TIMEOUT &
     fi
     PID=$!
     trap "kill -INT -$PID" INT
