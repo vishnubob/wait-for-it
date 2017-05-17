@@ -48,9 +48,9 @@ wait_for_wrapper()
 {
     # In order to support SIGINT during timeout: http://unix.stackexchange.com/a/57692
     if [[ $QUIET -eq 1 ]]; then
-        timeout $TIMEOUT $0 --quiet --child --host=$HOST --port=$PORT --timeout=$TIMEOUT &
+        timeout -t $TIMEOUT $0 --quiet --child --host=$HOST --port=$PORT --timeout=$TIMEOUT &
     else
-        timeout $TIMEOUT $0 --child --host=$HOST --port=$PORT --timeout=$TIMEOUT &
+        timeout -t $TIMEOUT $0 --child --host=$HOST --port=$PORT --timeout=$TIMEOUT &
     fi
     PID=$!
     trap "kill -INT -$PID" INT
