@@ -118,7 +118,6 @@ do
         ;;
         --)
         shift
-        CLI="$@"
         break
         ;;
         --help)
@@ -166,12 +165,12 @@ else
     fi
 fi
 
-if [[ $CLI != "" ]]; then
+if [[ $# > 0 ]]; then
     if [[ $RESULT -ne 0 && $STRICT -eq 1 ]]; then
         echoerr "$cmdname: strict mode, refusing to execute subprocess"
         exit $RESULT
     fi
-    exec $CLI
+    exec "$@"
 else
     exit $RESULT
 fi
