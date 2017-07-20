@@ -118,7 +118,7 @@ do
         ;;
         --)
         shift
-        CLI="$@"
+        CLI=("$@")
         break
         ;;
         --help)
@@ -171,7 +171,7 @@ if [[ $CLI != "" ]]; then
         echoerr "$cmdname: strict mode, refusing to execute subprocess"
         exit $RESULT
     fi
-    exec $CLI
+    exec "${CLI[@]}"
 else
     exit $RESULT
 fi
