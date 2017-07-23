@@ -141,15 +141,20 @@ STRICT=${STRICT:-0}
 CHILD=${CHILD:-0}
 QUIET=${QUIET:-0}
 
-# check to see if timeout is from busybox?
-# check to see if timeout is from busybox?
-TIMEOUT_PATH=$(realpath $(which timeout))
-if [[ $TIMEOUT_PATH =~ "busybox" ]]; then
+ISBUSY=0
+BUSYTIMEFLAG=""
+
+# Is this macOS?
+if [[ "$(uname)" == 'Darwin' ]]; then
+    # macOS lacks the timeout command -- this function adds an equivalent
+    function timeout() { perl -e 'alarm shift; exec @ARGV' "$@"; }
+else
+    # check to see if timeout is from busybox?
+    TIMEOUT_PATH=$(realpath $(which timeout))
+    if [[ $TIMEOUT_PATH =~ "busybox" ]]; then
         ISBUSY=1
         BUSYTIMEFLAG="-t"
-else
-        ISBUSY=0
-        BUSYTIMEFLAG=""
+    fi
 fi
 
 if [[ $CHILD -gt 0 ]]; then
