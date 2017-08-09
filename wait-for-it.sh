@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 #   Use this script to test if a given TCP host/port are available
 
 cmdname=$(basename $0)
@@ -154,7 +154,7 @@ if [[ "$HOST" == "" || "$PORT" == "" ]]; then
     echoerr "Error: you need to provide a host and port to test."
     usage
 fi
-TIMEOUT=${TIMEOUT:-15}
+TIMEOUT=${TIMEOUT:-15}   
 STRICT=${STRICT:-0}
 CHILD=${CHILD:-0}
 QUIET=${QUIET:-0}
