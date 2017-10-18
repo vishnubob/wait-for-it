@@ -14,6 +14,7 @@ Usage:
     -p PORT | --port=PORT       TCP port under test
                                 Alternatively, you specify the host and port as host:port
     -s | --strict               Only execute subcommand if the test succeeds
+    -d | --delay                Delay startup in seconds
     -q | --quiet                Don't output any status messages
     -t TIMEOUT | --timeout=TIMEOUT
                                 Timeout in seconds, zero for no timeout
@@ -51,6 +52,9 @@ wait_for()
 
 wait_for_wrapper()
 {
+	if [[ $DELAY -gt 0 ]]; then
+		sleep $DELAY
+	fi
     # In order to support SIGINT during timeout: http://unix.stackexchange.com/a/57692
     if [[ $QUIET -eq 1 ]]; then
         timeout $BUSYTIMEFLAG $TIMEOUT $0 --quiet --child --host=$HOST --port=$PORT --timeout=$TIMEOUT &
@@ -105,6 +109,15 @@ do
         ;;
         --port=*)
         PORT="${1#*=}"
+        shift 1
+        ;;
+         -d)
+        DELAY="$2"
+        if [[ $DELAY == "" ]]; then break; fi
+        shift 2
+        ;;
+        --delay=*)
+        DELAY="${1#*=}"
         shift 1
         ;;
         -t)
