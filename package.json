@@ -1,0 +1,10 @@
+{
+  "name": "wait-for-it",
+  "author": "Giles Hall",
+  "version": "1.0.0",
+  "license": "MIT",
+  "private": true,
+  "repository": {
+    "private-repo": "git+https://github.com/kethinov/wait-for-it"
+  }
+}
