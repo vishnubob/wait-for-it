@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #   Use this script to test if a given TCP host/port are available
 
-cmdname=$(basename $0)
+cmdname=${0##*/}
 
 echoerr() { if [[ $QUIET -ne 1 ]]; then echo "$@" 1>&2; fi }
 
@@ -142,8 +142,8 @@ CHILD=${CHILD:-0}
 QUIET=${QUIET:-0}
 
 # check to see if timeout is from busybox?
-# check to see if timeout is from busybox?
-TIMEOUT_PATH=$(realpath $(which timeout))
+TIMEOUT_PATH=$(type -p timeout)
+TIMEOUT_PATH=$(realpath $TIMEOUT_PATH 2>/dev/null || readlink -f $TIMEOUT_PATH)
 if [[ $TIMEOUT_PATH =~ "busybox" ]]; then
         ISBUSY=1
         BUSYTIMEFLAG="-t"
