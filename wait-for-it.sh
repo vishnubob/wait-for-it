@@ -67,6 +67,38 @@ wait_for_wrapper()
     return $WAITFORIT_RESULT
 }
 
+# taken from: https://stackoverflow.com/questions/4023830/how-to-compare-two-strings-in-dot-separated-version-format-in-bash/4025065#4025065
+version_comparison () {
+    if [[ $1 == $2 ]]
+    then
+        return 0
+    fi
+    local IFS=.
+    local i ver1=($1) ver2=($2)
+    # fill empty fields in ver1 with zeros
+    for ((i=${#ver1[@]}; i<${#ver2[@]}; i++))
+    do
+        ver1[i]=0
+    done
+    for ((i=0; i<${#ver1[@]}; i++))
+    do
+        if [[ -z ${ver2[i]} ]]
+        then
+            # fill empty fields in ver2 with zeros
+            ver2[i]=0
+        fi
+        if ((10#${ver1[i]} > 10#${ver2[i]}))
+        then
+            return 1
+        fi
+        if ((10#${ver1[i]} < 10#${ver2[i]}))
+        then
+            return 2
+        fi
+    done
+    return 0
+}
+
 # process arguments
 while [[ $# -gt 0 ]]
 do
@@ -146,7 +178,15 @@ WAITFORIT_TIMEOUT_PATH=$(type -p timeout)
 WAITFORIT_TIMEOUT_PATH=$(realpath $WAITFORIT_TIMEOUT_PATH 2>/dev/null || readlink -f $WAITFORIT_TIMEOUT_PATH)
 if [[ $WAITFORIT_TIMEOUT_PATH =~ "busybox" ]]; then
         WAITFORIT_ISBUSY=1
-        WAITFORIT_BUSYTIMEFLAG="-t"
+
+        WAITFORIT_BUSYVERSION=$(busybox | head -1 | sed 's/[^0-9.]*\([0-9.]*\).*/\1/')
+        version_comparison $WAITFORIT_BUSYVERSION "1.29"
+
+        if [ "$?" = "1" ]; then
+            WAITFORIT_BUSYTIMEFLAG=""
+        else
+            WAITFORIT_BUSYTIMEFLAG="-t"
+        fi
 
 else
         WAITFORIT_ISBUSY=0
