@@ -17,6 +17,8 @@ Usage:
     -q | --quiet                Don't output any status messages
     -t TIMEOUT | --timeout=TIMEOUT
                                 Timeout in seconds, zero for no timeout
+    -d delay | --delay=DELAY
+                                Delay in seconds after the test succeeds to trigger the command. zero for no timeout (default).
     -- COMMAND ARGS             Execute command with args after the test finishes
 USAGE
     exit 1
@@ -85,6 +87,10 @@ do
         WAITFORIT_QUIET=1
         shift 1
         ;;
+        -d | --delay)
+        WAITFORIT_DELAY=1
+        shift 1
+        ;;
         -s | --strict)
         WAITFORIT_STRICT=1
         shift 1
@@ -140,6 +146,7 @@ WAITFORIT_TIMEOUT=${WAITFORIT_TIMEOUT:-15}
 WAITFORIT_STRICT=${WAITFORIT_STRICT:-0}
 WAITFORIT_CHILD=${WAITFORIT_CHILD:-0}
 WAITFORIT_QUIET=${WAITFORIT_QUIET:-0}
+WAITFORIT_DELAY=${WAITFORIT_DELAY:-0}
 
 # check to see if timeout is from busybox?
 WAITFORIT_TIMEOUT_PATH=$(type -p timeout)
@@ -172,6 +179,7 @@ if [[ $WAITFORIT_CLI != "" ]]; then
         echoerr "$WAITFORIT_cmdname: strict mode, refusing to execute subprocess"
         exit $WAITFORIT_RESULT
     fi
+    sleep ${WAITFORIT_DELAY}
     exec "${WAITFORIT_CLI[@]}"
 else
     exit $WAITFORIT_RESULT
