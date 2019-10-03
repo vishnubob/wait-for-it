@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#   Use this script to test if a given TCP host/port are available
+#   Use this script to test if a given TCP host/port(s) are available
 
 WAITFORIT_cmdname=${0##*/}
 
@@ -12,7 +12,8 @@ Usage:
     $WAITFORIT_cmdname host:port [-s] [-t timeout] [-- command args]
     -h HOST | --host=HOST       Host or IP under test
     -p PORT | --port=PORT       TCP port under test
-                                Alternatively, you specify the host and port as host:port
+                                Alternatively, you specify the host and port as host:port,
+                                multiple parameters allowed
     -s | --strict               Only execute subcommand if the test succeeds
     -q | --quiet                Don't output any status messages
     -t TIMEOUT | --timeout=TIMEOUT
@@ -67,14 +68,19 @@ wait_for_wrapper()
     return $WAITFORIT_RESULT
 }
 
+declare -a WAITFORIT_HOSTS
+declare -a WAITFORIT_PORTS
+I=0
+
 # process arguments
 while [[ $# -gt 0 ]]
 do
     case "$1" in
         *:* )
         WAITFORIT_hostport=(${1//:/ })
-        WAITFORIT_HOST=${WAITFORIT_hostport[0]}
-        WAITFORIT_PORT=${WAITFORIT_hostport[1]}
+        I=$((I + 1))
+        WAITFORIT_HOSTS[I]=${WAITFORIT_hostport[0]}
+        WAITFORIT_PORTS[I]=${WAITFORIT_hostport[1]}
         shift 1
         ;;
         --child)
@@ -90,21 +96,21 @@ do
         shift 1
         ;;
         -h)
-        WAITFORIT_HOST="$2"
-        if [[ $WAITFORIT_HOST == "" ]]; then break; fi
+        WAITFORIT_HOSTS[0]="$2"
+        if [[ $WAITFORIT_HOSTS[0] == "" ]]; then break; fi
         shift 2
         ;;
         --host=*)
-        WAITFORIT_HOST="${1#*=}"
+        WAITFORIT_HOSTS[0]="${1#*=}"
         shift 1
         ;;
         -p)
-        WAITFORIT_PORT="$2"
-        if [[ $WAITFORIT_PORT == "" ]]; then break; fi
+        WAITFORIT_PORTS[0]="$2"
+        if [[ $WAITFORIT_PORTS[0] == "" ]]; then break; fi
         shift 2
         ;;
         --port=*)
-        WAITFORIT_PORT="${1#*=}"
+        WAITFORIT_PORTS[0]="${1#*=}"
         shift 1
         ;;
         -t)
@@ -131,8 +137,8 @@ do
     esac
 done
 
-if [[ "$WAITFORIT_HOST" == "" || "$WAITFORIT_PORT" == "" ]]; then
-    echoerr "Error: you need to provide a host and port to test."
+if [[ "${#WAITFORIT_HOSTS[*]}" == "0" || "${#WAITFORIT_PORTS[*]}" == "0" ]]; then
+    echoerr "Error: you need to provide at least one host and port to test."
     usage
 fi
 
@@ -153,19 +159,23 @@ else
         WAITFORIT_BUSYTIMEFLAG=""
 fi
 
-if [[ $WAITFORIT_CHILD -gt 0 ]]; then
-    wait_for
-    WAITFORIT_RESULT=$?
-    exit $WAITFORIT_RESULT
-else
-    if [[ $WAITFORIT_TIMEOUT -gt 0 ]]; then
-        wait_for_wrapper
-        WAITFORIT_RESULT=$?
-    else
+for i in "${!WAITFORIT_HOSTS[@]}"; do
+    WAITFORIT_HOST=${WAITFORIT_HOSTS[$i]}
+    WAITFORIT_PORT=${WAITFORIT_PORTS[$i]}
+    if [[ $WAITFORIT_CHILD -gt 0 ]]; then
         wait_for
         WAITFORIT_RESULT=$?
+        exit $WAITFORIT_RESULT
+    else
+        if [[ $WAITFORIT_TIMEOUT -gt 0 ]]; then
+            wait_for_wrapper
+            WAITFORIT_RESULT=$?
+        else
+            wait_for
+            WAITFORIT_RESULT=$?
+        fi
     fi
-fi
+done
 
 if [[ $WAITFORIT_CLI != "" ]]; then
     if [[ $WAITFORIT_RESULT -ne 0 && $WAITFORIT_STRICT -eq 1 ]]; then
