@@ -1,13 +1,14 @@
-#!/usr/bin/env ash
+#!/bin/ash
 #   Use this script to test if a given TCP host/port are available
 # 
 ## This is ash (busybox) version wait-for-it.sh 
 ## Adapt by Job Diogenes at fork (github.com/jobdiogenes/wait-for-it)
 ## Tested in a docker alpine
+## Depends from grep and sed 
 #
 WAITFORIT_cmdname=${0##*/}
 
-echoerr() { if [[ $WAITFORIT_QUIET -ne 1 ]]; then echo "$@" 1>&2; fi }
+echoerr() { if [[ "$WAITFORIT_QUIET" == "" ]]; then echo "$@" 1>&2; fi }
 
 usage()
 {
@@ -71,9 +72,22 @@ wait_for_wrapper()
     return $WAITFORIT_RESULT
 }
 
+check_depends()
+{
+    IS_SED="$(type sed)"
+    IS_GREP="$(type grep)"    
+    if [[ "$IS_SED" == "sed: not found" || "$IS_GREP" == "grep: not found" ]]; then
+      echoerr "$WAITFORIT_cmdname: needs grep and sed to work, but was not found"
+      exit 1
+    fi
+    return 0
+}
+
+check_depends
+
 # process arguments
 while [[ $# -gt 0 ]]
-do    
+do  
     case "$1" in
         *:* )
         WAITFORIT_HOST="$(echo $1 | sed -e 's,:.*,,g')"
