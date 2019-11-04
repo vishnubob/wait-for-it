@@ -140,17 +140,23 @@ WAITFORIT_TIMEOUT=${WAITFORIT_TIMEOUT:-15}
 WAITFORIT_STRICT=${WAITFORIT_STRICT:-0}
 WAITFORIT_CHILD=${WAITFORIT_CHILD:-0}
 WAITFORIT_QUIET=${WAITFORIT_QUIET:-0}
-
-# check to see if timeout is from busybox?
+WAITFORIT_ISBUSY=0
+WAITFORIT_BUSYTIMEFLAG=""
 WAITFORIT_TIMEOUT_PATH=$(type -p timeout)
 WAITFORIT_TIMEOUT_PATH=$(realpath $WAITFORIT_TIMEOUT_PATH 2>/dev/null || readlink -f $WAITFORIT_TIMEOUT_PATH)
-if [[ $WAITFORIT_TIMEOUT_PATH =~ "busybox" ]]; then
-        WAITFORIT_ISBUSY=1
-        WAITFORIT_BUSYTIMEFLAG="-t"
 
-else
-        WAITFORIT_ISBUSY=0
-        WAITFORIT_BUSYTIMEFLAG=""
+# check to see if we're using busybox?
+if [[ $WAITFORIT_TIMEOUT_PATH =~ "busybox" ]]; then
+    WAITFORIT_ISBUSY=1
+fi
+
+# see if timeout.c args have been updated in busybox v1.30.0 or newer
+# note: this requires the use of bash on Alpine
+if [[ $WAITFORIT_ISBUSY && $(busybox | head -1) =~ ^.*v([[:digit:]]+)\.([[:digit:]]+)\..+$ ]]; then
+    if [[ ${BASH_REMATCH[1]} -le 1 && ${BASH_REMATCH[2]} -lt 30 ]]; then
+        # using pre 1.30.0 version with `-t SEC` arg
+        WAITFORIT_BUSYTIMEFLAG="-t"
+    fi
 fi
 
 if [[ $WAITFORIT_CHILD -gt 0 ]]; then
