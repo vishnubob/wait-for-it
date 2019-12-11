@@ -60,3 +60,6 @@ $ echo $?
 124
 ```
 
+## Community
+
+*Debian*: There is a [Debian package](https://tracker.debian.org/pkg/wait-for-it).
