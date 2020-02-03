@@ -1,0 +1,7 @@
+{
+    "name": "vishnubob/wait-for-it",
+    "description": "Pure bash script to test and wait on the availability of a TCP host and port",
+    "type": "library",
+    "license": "MIT",
+    "bin": ["wait-for-it.sh"]
+}
