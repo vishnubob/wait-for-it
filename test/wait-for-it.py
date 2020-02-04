@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import unittest
 import shlex
 from subprocess import Popen, PIPE
@@ -24,13 +26,13 @@ class TestWaitForIt(unittest.TestCase):
         proc = Popen(args, stdout=PIPE, stderr=PIPE)
         out, err = proc.communicate()
         exitcode = proc.returncode
-        return exitcode, out, err
+        return exitcode, out.decode('utf-8'), err.decode('utf-8')
 
-    def open_local_port(self, host="localhost", port=8929, timeout=5):
+    def open_local_port(self, timeout=5):
         s = socket.socket()
-        s.bind((host, port))
+        s.bind(('', 0))
         s.listen(timeout)
-        return s
+        return s, s.getsockname()[1]
 
     def check_args(self, args, stdout_regex, stderr_regex, exitcode):
         command = self.wait_script + " " + args
@@ -102,11 +104,11 @@ class TestWaitForIt(unittest.TestCase):
 
     def test_host_port(self):
         """ Check that --host and --port args work correctly """
-        soc = self.open_local_port(port=8929)
+        soc, port = self.open_local_port()
         self.check_args(
-            "--host=localhost --port=8929 --timeout=1",
+            "--host=localhost --port={0} --timeout=1".format(port),
             "",
-            "wait-for-it.sh: waiting 1 seconds for localhost:8929",
+            "wait-for-it.sh: waiting 1 seconds for localhost:{0}".format(port),
             0
         )
         soc.close()
@@ -116,14 +118,15 @@ class TestWaitForIt(unittest.TestCase):
             Tests that wait-for-it.sh returns correctly after establishing a
             connectionm using combined host and ports
         """
-        soc = self.open_local_port(port=8929)
+        soc, port = self.open_local_port()
         self.check_args(
-            "localhost:8929 --timeout=1",
+            "localhost:{0} --timeout=1".format(port),
             "",
-            "wait-for-it.sh: waiting 1 seconds for localhost:8929",
+            "wait-for-it.sh: waiting 1 seconds for localhost:{0}".format(port),
             0
         )
         soc.close()
+
 
     def test_port_failure_with_timeout(self):
         """
@@ -140,11 +143,11 @@ class TestWaitForIt(unittest.TestCase):
         """
             Checks that a command executes correctly after a port test passes
         """
-        soc = self.open_local_port(port=8929)
+        soc, port = self.open_local_port()
         self.check_args(
-            "localhost:8929 -- echo \"CMD OUTPUT\"",
+            "localhost:{0} -- echo \"CMD OUTPUT\"".format(port),
             "CMD OUTPUT",
-            ".*wait-for-it.sh: localhost:8929 is available after 0 seconds",
+            ".*wait-for-it.sh: localhost:{0} is available after 0 seconds".format(port),
             0
         )
         soc.close()
@@ -154,9 +157,9 @@ class TestWaitForIt(unittest.TestCase):
             Check command failure. The command in question outputs STDERR and
             an exit code of 2
         """
-        soc = self.open_local_port(port=8929)
+        soc, port = self.open_local_port()
         self.check_args(
-            "localhost:8929 -- ls not_real_file",
+            "localhost:{0} -- ls not_real_file".format(port),
             "",
             ".*No such file or directory\n",
             2
