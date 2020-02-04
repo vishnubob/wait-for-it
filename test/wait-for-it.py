@@ -34,9 +34,9 @@ class TestWaitForIt(unittest.TestCase):
         s.listen(timeout)
         return s, s.getsockname()[1]
 
-    def check_args(self, args, stdout_regex, stderr_regex, exitcode):
+    def check_args(self, args, stdout_regex, stderr_regex, should_succeed):
         command = self.wait_script + " " + args
-        actual_exitcode, out, err = self.execute(command)
+        exitcode, out, err = self.execute(command)
 
         # Check stderr
         msg = ("Failed check that STDERR:\n" +
@@ -53,7 +53,7 @@ class TestWaitForIt(unittest.TestCase):
         self.assertIsNotNone(re.match(stdout_regex, out, re.DOTALL), msg)
 
         # Check exit code
-        self.assertEqual(actual_exitcode, exitcode)
+        self.assertEqual(should_succeed, exitcode == 0)
 
     def setUp(self):
         script_path = os.path.dirname(sys.argv[0])
@@ -69,7 +69,7 @@ class TestWaitForIt(unittest.TestCase):
             "",
             "^$",
             MISSING_ARGS_TEXT,
-            1
+            False
         )
         # Return code should be 1 when called with no args
         exitcode, out, err = self.execute(self.wait_script)
@@ -81,7 +81,7 @@ class TestWaitForIt(unittest.TestCase):
            "--help",
            "",
            HELP_TEXT,
-           1
+           False
         )
 
     def test_no_port(self):
@@ -90,7 +90,7 @@ class TestWaitForIt(unittest.TestCase):
             "--host=localhost",
             "",
             MISSING_ARGS_TEXT,
-            1
+            False
         )
 
     def test_no_host(self):
@@ -99,7 +99,7 @@ class TestWaitForIt(unittest.TestCase):
             "--port=80",
             "",
             MISSING_ARGS_TEXT,
-            1
+            False
         )
 
     def test_host_port(self):
@@ -109,7 +109,7 @@ class TestWaitForIt(unittest.TestCase):
             "--host=localhost --port={0} --timeout=1".format(port),
             "",
             "wait-for-it.sh: waiting 1 seconds for localhost:{0}".format(port),
-            0
+            True
         )
         soc.close()
 
@@ -123,7 +123,7 @@ class TestWaitForIt(unittest.TestCase):
             "localhost:{0} --timeout=1".format(port),
             "",
             "wait-for-it.sh: waiting 1 seconds for localhost:{0}".format(port),
-            0
+            True
         )
         soc.close()
 
@@ -136,7 +136,7 @@ class TestWaitForIt(unittest.TestCase):
             "localhost:8929 --timeout=1",
             "",
             ".*timeout occurred after waiting 1 seconds for localhost:8929",
-            124
+            False
         )
 
     def test_command_execution(self):
@@ -148,7 +148,7 @@ class TestWaitForIt(unittest.TestCase):
             "localhost:{0} -- echo \"CMD OUTPUT\"".format(port),
             "CMD OUTPUT",
             ".*wait-for-it.sh: localhost:{0} is available after 0 seconds".format(port),
-            0
+            True
         )
         soc.close()
 
@@ -162,7 +162,7 @@ class TestWaitForIt(unittest.TestCase):
             "localhost:{0} -- ls not_real_file".format(port),
             "",
             ".*No such file or directory\n",
-            2
+            False
         )
         soc.close()
 
@@ -175,7 +175,7 @@ class TestWaitForIt(unittest.TestCase):
             "localhost:8929 --timeout=1 -- echo \"CMD OUTPUT\"",
             "CMD OUTPUT",
             ".*timeout occurred after waiting 1 seconds for localhost:8929",
-            0
+            True
         )
 
 if __name__ == '__main__':
