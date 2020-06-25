@@ -9,6 +9,8 @@ wait-for-it.sh host:port [-s] [-t timeout] [-- command args]
 -h HOST | --host=HOST       Host or IP under test
 -p PORT | --port=PORT       TCP port under test
                             Alternatively, you specify the host and port as host:port
+-r | --reverse              Perform the reverse test, wait until a port is
+                            no longer available
 -s | --strict               Only execute subcommand if the test succeeds
 -q | --quiet                Don't output any status messages
 -t TIMEOUT | --timeout=TIMEOUT
@@ -34,6 +36,15 @@ $ ./wait-for-it.sh -t 0 www.google.com:80 -- echo "google is up"
 wait-for-it.sh: waiting for www.google.com:80 without a timeout
 wait-for-it.sh: www.google.com:80 is available after 0 seconds
 google is up
+```
+
+You can perform the reverse test with the `-r` or `--reverse` option.  Setting the reverse flag will check if the port is unavailable and if it is, echo the message `port is unavailable`.
+
+```
+$ ./wait-for-it.sh localhost:0 --reverse -- echo "port is unavailable"
+wait-for-it.sh: waiting 15 seconds for localhost:0
+wait-for-it.sh: localhost:0 is unavailable after 0 seconds
+port is unavailable
 ```
 
 The subcommand will be executed regardless if the service is up or not.  If you wish to execute the subcommand only if the service is up, add the `--strict` argument. In this example, we will test port 81 on www.google.com which will fail:
