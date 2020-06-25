@@ -113,6 +113,17 @@ class TestWaitForIt(unittest.TestCase):
         )
         soc.close()
 
+    def test_reverse_host_port(self):
+        """ Check that --reverse args work correctly """
+        soc, port = self.open_local_port()
+        soc.close()
+        self.check_args(
+            "--host=localhost --port={0} --timeout=1 --reverse".format(port),
+            "",
+            ".*wait-for-it.sh: localhost:{0} is unavailable after 0 seconds".format(port),
+            True
+        )
+
     def test_combined_host_port(self):
         """
             Tests that wait-for-it.sh returns correctly after establishing a
@@ -130,7 +141,7 @@ class TestWaitForIt(unittest.TestCase):
 
     def test_port_failure_with_timeout(self):
         """
-            Note exit status of 124 is exected, passed from the timeout command
+            Note exit status of 124 is expected, passed from the timeout command
         """
         self.check_args(
             "localhost:8929 --timeout=1",
