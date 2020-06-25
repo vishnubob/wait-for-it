@@ -50,7 +50,7 @@ wait_for()
         fi
         sleep 1
     done
-    return $WAITFORIT_result
+    return $([[ $WAITFORIT_result -eq $WAITFORIT_test_success ]] && echo 0 || echo 1)
 }
 
 wait_for_wrapper()
