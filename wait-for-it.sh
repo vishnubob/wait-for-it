@@ -13,7 +13,7 @@ Usage:
     -h HOST | --host=HOST       Host or IP under test
     -p PORT | --port=PORT       TCP port under test
                                 Alternatively, you specify the host and port as host:port
-    -r | --reverse              Perform reverse test, wait until a port is
+    -r | --reverse              Perform the reverse test, wait until a port is
                                 no longer available
     -s | --strict               Only execute subcommand if the test succeeds
     -q | --quiet                Don't output any status messages
