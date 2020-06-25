@@ -9,10 +9,12 @@ usage()
 {
     cat << USAGE >&2
 Usage:
-    $WAITFORIT_cmdname host:port [-s] [-t timeout] [-- command args]
+    $WAITFORIT_cmdname host:port [-r] [-s] [-t timeout] [-- command args]
     -h HOST | --host=HOST       Host or IP under test
     -p PORT | --port=PORT       TCP port under test
                                 Alternatively, you specify the host and port as host:port
+    -r | --reverse              Perform reverse test, wait until a port is
+                                no longer available
     -s | --strict               Only execute subcommand if the test succeeds
     -q | --quiet                Don't output any status messages
     -t TIMEOUT | --timeout=TIMEOUT
@@ -32,6 +34,7 @@ wait_for()
     WAITFORIT_start_ts=$(date +%s)
     while :
     do
+        WAITFORIT_test_success=$([[ $WAITFORIT_REVERSE -eq 0 ]] && echo 0 || echo 1)
         if [[ $WAITFORIT_ISBUSY -eq 1 ]]; then
             nc -z $WAITFORIT_HOST $WAITFORIT_PORT
             WAITFORIT_result=$?
@@ -39,9 +42,10 @@ wait_for()
             (echo > /dev/tcp/$WAITFORIT_HOST/$WAITFORIT_PORT) >/dev/null 2>&1
             WAITFORIT_result=$?
         fi
-        if [[ $WAITFORIT_result -eq 0 ]]; then
+        if [[ $WAITFORIT_result -eq $WAITFORIT_test_success ]]; then
             WAITFORIT_end_ts=$(date +%s)
-            echoerr "$WAITFORIT_cmdname: $WAITFORIT_HOST:$WAITFORIT_PORT is available after $((WAITFORIT_end_ts - WAITFORIT_start_ts)) seconds"
+            WAITFORIT_availability=$([[ $WAITFORIT_REVERSE -eq 0 ]] && echo "available" || echo "unavailable")
+            echoerr "$WAITFORIT_cmdname: $WAITFORIT_HOST:$WAITFORIT_PORT is $WAITFORIT_availability after $((WAITFORIT_end_ts - WAITFORIT_start_ts)) seconds"
             break
         fi
         sleep 1
@@ -51,12 +55,11 @@ wait_for()
 
 wait_for_wrapper()
 {
+    WAITFORIT_QUIETFLAG=$([[ $WAITFORIT_QUIET -eq 1 ]] && echo "--quiet")
+    WAITFORIT_REVERSEFLAG=$([[ $WAITFORIT_REVERSE -eq 1 ]] && echo "--reverse")
+
     # In order to support SIGINT during timeout: http://unix.stackexchange.com/a/57692
-    if [[ $WAITFORIT_QUIET -eq 1 ]]; then
-        timeout $WAITFORIT_BUSYTIMEFLAG $WAITFORIT_TIMEOUT $0 --quiet --child --host=$WAITFORIT_HOST --port=$WAITFORIT_PORT --timeout=$WAITFORIT_TIMEOUT &
-    else
-        timeout $WAITFORIT_BUSYTIMEFLAG $WAITFORIT_TIMEOUT $0 --child --host=$WAITFORIT_HOST --port=$WAITFORIT_PORT --timeout=$WAITFORIT_TIMEOUT &
-    fi
+    timeout $WAITFORIT_BUSYTIMEFLAG $WAITFORIT_TIMEOUT $0 --child --host=$WAITFORIT_HOST --port=$WAITFORIT_PORT $WAITFORIT_REVERSEFLAG $WAITFORIT_REVERSEFLAG --timeout=$WAITFORIT_TIMEOUT &
     WAITFORIT_PID=$!
     trap "kill -INT -$WAITFORIT_PID" INT
     wait $WAITFORIT_PID
@@ -83,6 +86,10 @@ do
         ;;
         -q | --quiet)
         WAITFORIT_QUIET=1
+        shift 1
+        ;;
+        -r | --reverse)
+        WAITFORIT_REVERSE=1
         shift 1
         ;;
         -s | --strict)
@@ -137,9 +144,10 @@ if [[ "$WAITFORIT_HOST" == "" || "$WAITFORIT_PORT" == "" ]]; then
 fi
 
 WAITFORIT_TIMEOUT=${WAITFORIT_TIMEOUT:-15}
-WAITFORIT_STRICT=${WAITFORIT_STRICT:-0}
 WAITFORIT_CHILD=${WAITFORIT_CHILD:-0}
 WAITFORIT_QUIET=${WAITFORIT_QUIET:-0}
+WAITFORIT_REVERSE=${WAITFORIT_REVERSE:-0}
+WAITFORIT_STRICT=${WAITFORIT_STRICT:-0}
 
 # Check to see if timeout is from busybox?
 WAITFORIT_TIMEOUT_PATH=$(type -p timeout)
