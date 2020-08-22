@@ -1,2 +1,2 @@
-docker>=2.0.0
-dtt>=1.2.0
+docker>=4.0.0
+parameterized>=0.7.0
