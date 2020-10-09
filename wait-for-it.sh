@@ -7,7 +7,8 @@ echoerr() { if [[ $WAITFORIT_QUIET -ne 1 ]]; then echo "$@" 1>&2; fi }
 
 usage()
 {
-    cat << USAGE >&2
+    [[ $1 ]] && out=2 || out=1
+    cat << USAGE >&$out
 Usage:
     $WAITFORIT_cmdname host:port [-s] [-t timeout] [-- command args]
     -h HOST | --host=HOST       Host or IP under test
@@ -19,7 +20,7 @@ Usage:
                                 Timeout in seconds, zero for no timeout
     -- COMMAND ARGS             Execute command with args after the test finishes
 USAGE
-    exit 1
+    exit ${1:-0}
 }
 
 wait_for()
@@ -126,14 +127,14 @@ do
         ;;
         *)
         echoerr "Unknown argument: $1"
-        usage
+        usage 1
         ;;
     esac
 done
 
 if [[ "$WAITFORIT_HOST" == "" || "$WAITFORIT_PORT" == "" ]]; then
     echoerr "Error: you need to provide a host and port to test."
-    usage
+    usage 1
 fi
 
 WAITFORIT_TIMEOUT=${WAITFORIT_TIMEOUT:-15}
