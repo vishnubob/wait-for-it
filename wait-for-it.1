@@ -1,0 +1,29 @@
+.\" Manpage for wait-for-it.sh
+.\" Contact aviau@debian.org to correct errors or typos.
+.TH man 8 "29 April 2016" "1.0" "wait-for-it man page"
+.SH NAME
+wait-for-it \- script to test and wait on the availability of a TCP host and port
+.SH SYNOPSIS
+wait-for-it host:port [-s] [-t timeout] [-- command args]
+.SH DESCRIPTION
+wait-forit is a pure bash script that will wait on the availability of a host and TCP port. It is useful for synchronizing the spin-up of interdependent services, such as linked docker containers. Since it is a pure bash script, it does not have any external dependencies.
+.SH OPTIONS
+.B \-h HOST, \-\-host=HOST
+Host or IP under test
+.TP
+.B \-p PORT, \-\-port=PORT
+TCP port under test
+.TP
+.B \-s, \-\-strict
+Only execute subcommand if the test succeeds
+.TP
+.B \-q, \-\-quiet
+Don't output any status messages
+.TP
+.B \-t TIMEOUT, \-\-timeout=TIMEOUT
+Timeout in seconds, zero for no timeout
+.TP
+.B \-\- COMMAND ARGS
+Execute command with args after the test finishes
+.SH AUTHOR
+Giles Hall
