@@ -1,6 +1,9 @@
 language: python
 python:
   - "2.7"
+arch:
+- amd64
+- ppc64le
 
 script:
   - python test/wait-for-it.py
