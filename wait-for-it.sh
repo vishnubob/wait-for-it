@@ -152,7 +152,7 @@ fi
 
 # see if timeout.c args have been updated in busybox v1.30.0 or newer
 # note: this requires the use of bash on Alpine
-if [[ $WAITFORIT_ISBUSY && $(busybox | head -1) =~ ^.*v([[:digit:]]+)\.([[:digit:]]+)\..+$ ]]; then
+if [[ $WAITFORIT_ISBUSY -eq 1 && $(busybox | head -1) =~ ^.*v([[:digit:]]+)\.([[:digit:]]+)\..+$ ]]; then
     if [[ ${BASH_REMATCH[1]} -le 1 && ${BASH_REMATCH[2]} -lt 30 ]]; then
         # using pre 1.30.0 version with `-t SEC` arg
         WAITFORIT_BUSYTIMEFLAG="-t"
