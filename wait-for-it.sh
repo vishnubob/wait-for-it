@@ -15,7 +15,8 @@ Usage:
                                 Alternatively, you specify the host and port as host:port
     -c COMMAND | --command=COMMAND 
                                 A single command to test
-    -w TIMEOUT | --wait=TIMEOUT Wait / sleep time between each test attempt
+    -i TIMEOUT | --interval=TIMEOUT
+                                Wait / sleep time interval between each test attempt
     -s | --strict               Only execute subcommand if the test succeeds
     -q | --quiet                Don't output any status messages
     -t TIMEOUT | --timeout=TIMEOUT
@@ -102,12 +103,12 @@ do
         WAITFORIT_COMMAND="${1#*=}"
         shift 1
         ;;
-        -w)
+        -i)
         WAITFORIT_SLEEP_TIME="$2"
         if [[ $WAITFORIT_SLEEP_TIME == "" ]]; then break; fi
         shift 2
         ;;
-        --wait=*)
+        --interval=*)
         WAITFORIT_SLEEP_TIME="${1#*=}"
         shift 1
         ;;
