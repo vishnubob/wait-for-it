@@ -32,11 +32,11 @@ wait_for()
     WAITFORIT_start_ts=$(date +%s)
     while :
     do
-        if [[ $WAITFORIT_ISBUSY -eq 1 ]]; then
-            nc -z $WAITFORIT_HOST $WAITFORIT_PORT
+        if command -v nc &> /dev/null ; then
+            nc -z -w 10 $WAITFORIT_HOST $WAITFORIT_PORT
             WAITFORIT_result=$?
         else
-            (echo -n > /dev/tcp/$WAITFORIT_HOST/$WAITFORIT_PORT) >/dev/null 2>&1
+            timeout 10 bash -c "(echo -n > /dev/tcp/$WAITFORIT_HOST/$WAITFORIT_PORT) >/dev/null 2>&1"
             WAITFORIT_result=$?
         fi
         if [[ $WAITFORIT_result -eq 0 ]]; then
