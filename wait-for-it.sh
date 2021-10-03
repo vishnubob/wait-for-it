@@ -15,6 +15,8 @@ Usage:
                                 Alternatively, you specify the host and port as host:port
     -s | --strict               Only execute subcommand if the test succeeds
     -q | --quiet                Don't output any status messages
+    -v | --verbose              Output each failed attempt to connect
+    -nc | --netcat              Force to use netcat instead of bash tcp detection
     -t TIMEOUT | --timeout=TIMEOUT
                                 Timeout in seconds, zero for no timeout
     -- COMMAND ARGS             Execute command with args after the test finishes
@@ -32,11 +34,15 @@ wait_for()
     WAITFORIT_start_ts=$(date +%s)
     while :
     do
-        if [[ $WAITFORIT_ISBUSY -eq 1 ]]; then
-            nc -z $WAITFORIT_HOST $WAITFORIT_PORT
+        if [[ $WAITFORIT_ISBUSY -eq 1 ]] || [[ $WAITFORIT_NETCAT -eq 1 ]]; then
+            nc -z${WAITFORIT_VERBOSE:-} $WAITFORIT_HOST $WAITFORIT_PORT
             WAITFORIT_result=$?
         else
-            (echo -n > /dev/tcp/$WAITFORIT_HOST/$WAITFORIT_PORT) >/dev/null 2>&1
+            if [[ -z "$WAITFORIT_VERBOSE" ]]; then
+                (echo -n > /dev/tcp/$WAITFORIT_HOST/$WAITFORIT_PORT) >/dev/null 2>&1
+            else
+                (echo -n > /dev/tcp/$WAITFORIT_HOST/$WAITFORIT_PORT)
+            fi
             WAITFORIT_result=$?
         fi
         if [[ $WAITFORIT_result -eq 0 ]]; then
@@ -81,8 +87,16 @@ do
         WAITFORIT_CHILD=1
         shift 1
         ;;
+        -v| --verbose)
+        export WAITFORIT_VERBOSE=v
+        shift 1
+        ;;
         -q | --quiet)
         WAITFORIT_QUIET=1
+        shift 1
+        ;;
+        -nc | --netcat)
+        export WAITFORIT_NETCAT=1
         shift 1
         ;;
         -s | --strict)
@@ -140,6 +154,7 @@ WAITFORIT_TIMEOUT=${WAITFORIT_TIMEOUT:-15}
 WAITFORIT_STRICT=${WAITFORIT_STRICT:-0}
 WAITFORIT_CHILD=${WAITFORIT_CHILD:-0}
 WAITFORIT_QUIET=${WAITFORIT_QUIET:-0}
+export WAITFORIT_NETCAT=${WAITFORIT_NETCAT:-0}
 
 # Check to see if timeout is from busybox?
 WAITFORIT_TIMEOUT_PATH=$(type -p timeout)
