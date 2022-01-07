@@ -62,7 +62,7 @@ class TestWaitForIt(unittest.TestCase):
 
     def test_no_args(self):
         """
-            Check that no aruments returns the missing args text and the
+            Check that no arguments returns the missing args text and the
             correct return code
         """
         self.check_args(
@@ -130,7 +130,7 @@ class TestWaitForIt(unittest.TestCase):
 
     def test_port_failure_with_timeout(self):
         """
-            Note exit status of 124 is exected, passed from the timeout command
+            Note exit status of 124 is expected, passed from the timeout command
         """
         self.check_args(
             "localhost:8929 --timeout=1",
@@ -169,7 +169,7 @@ class TestWaitForIt(unittest.TestCase):
     def test_command_after_connection_failure(self):
         """
             Test that a command still runs even if a connection times out
-            and that the return code is correct for the comand being run
+            and that the return code is correct for the command being run
         """
         self.check_args(
             "localhost:8929 --timeout=1 -- echo \"CMD OUTPUT\"",
