@@ -1,0 +1,23 @@
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  wait_for_it:
+    runs-on: ubuntu-latest
+    name: Ensure action works
+    steps:
+      - name: Start local server on port 80
+        run: python -m SimpleHTTPServer 80
+      - name: Start local server on port 3000
+        run: python -m SimpleHTTPServer 80
+      - name: Defaults
+        uses: actions/wait-for-it@v1
+        with:
+          host: localhost
+      - name: Non-default port
+        uses: actions/wait-for-it@v1
+        with:
+          host: localhost
+          port: 3000
