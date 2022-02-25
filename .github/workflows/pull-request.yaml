@@ -11,9 +11,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Start local server on port 80
-        run: python -m SimpleHTTPServer 80
+        run: mini_httpd &
       - name: Start local server on port 3000
-        run: python -m SimpleHTTPServer 80
+        run: mini_httpd -p 3000 &
       - name: Defaults
         uses: ./
         with:
