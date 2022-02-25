@@ -14,7 +14,7 @@ inputs:
     default: 'false'
   timeout:
     description: 'Timeout in seconds, zero for no timeout'
-    required: true
+    required: false
     default: '60'
   command:
     description: 'Execute command after the test has completed'
@@ -27,9 +27,15 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - --host ${{ inputs.host }}
-    - --port ${{ inputs.port }}
-    - --strict ${{ inputs.strict }}
-    - --timeout ${{ inputs.timeout }}
-    - --quiet ${{ inputs.quiet }}
-    - -- ${{ inputs.command }}
+    - --host 
+    - ${{ inputs.host }}
+    - --port 
+    - ${{ inputs.port }}
+    - --strict
+    - ${{ inputs.strict }}
+    - --timeout
+    - ${{ inputs.timeout }}
+    - --quiet
+    - ${{ inputs.quiet }}
+    - --
+    - ${{ inputs.command }}
