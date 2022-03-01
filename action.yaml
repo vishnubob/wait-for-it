@@ -1,0 +1,35 @@
+name: 'wait-for-it'
+description: 'Wait for a response'
+inputs:
+  host:
+    description: 'Host or IP under test'
+    required: true
+  port:
+    description: 'TCP port under test, default: 80'
+    required: false
+    default: '80'
+  strict:
+    description: 'Only execute subcommand if the test succeeds'
+    required: false
+    default: 'false'
+  timeout:
+    description: 'Timeout in seconds, zero for no timeout'
+    required: false
+    default: '60'
+  command:
+    description: 'Execute command after the test has completed'
+    required: false
+  quiet:
+    description: "Don't output any status messages"
+    required: false
+    default: 'false'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - --host=${{ inputs.host }}
+    - --port=${{ inputs.port }}
+    - --strict=${{ inputs.strict }}
+    - --timeout=${{ inputs.timeout }}
+    - --quiet=${{ inputs.quiet }}
+    - -- ${{ inputs.command }}

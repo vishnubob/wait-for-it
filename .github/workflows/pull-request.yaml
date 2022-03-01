@@ -1,0 +1,30 @@
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  wait_for_it:
+    runs-on: ubuntu-latest
+    name: Ensure action works
+    services:
+      test-site-80:
+        image: httpd
+        options: >-
+          -p 3000
+      test-site-3000:
+        image: httpd
+        options: >-
+          -p 3000
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Defaults
+        uses: ./
+        with:
+          host: test-site-80
+      - name: Non-default port
+        uses: ./
+        with:
+          host: test-site-3000
+          port: 3000
