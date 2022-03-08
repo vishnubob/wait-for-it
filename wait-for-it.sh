@@ -4,6 +4,7 @@
 WAITFORIT_cmdname=${0##*/}
 
 echoerr() { if [[ $WAITFORIT_QUIET -ne 1 ]]; then echo "$@" 1>&2; fi }
+echoout() { if [[ $WAITFORIT_QUIET -ne 1 ]]; then echo "$@"; fi }
 
 usage()
 {
@@ -25,9 +26,9 @@ USAGE
 wait_for()
 {
     if [[ $WAITFORIT_TIMEOUT -gt 0 ]]; then
-        echoerr "$WAITFORIT_cmdname: waiting $WAITFORIT_TIMEOUT seconds for $WAITFORIT_HOST:$WAITFORIT_PORT"
+        echoout "$WAITFORIT_cmdname: waiting $WAITFORIT_TIMEOUT seconds for $WAITFORIT_HOST:$WAITFORIT_PORT"
     else
-        echoerr "$WAITFORIT_cmdname: waiting for $WAITFORIT_HOST:$WAITFORIT_PORT without a timeout"
+        echoout "$WAITFORIT_cmdname: waiting for $WAITFORIT_HOST:$WAITFORIT_PORT without a timeout"
     fi
     WAITFORIT_start_ts=$(date +%s)
     while :
@@ -41,7 +42,7 @@ wait_for()
         fi
         if [[ $WAITFORIT_result -eq 0 ]]; then
             WAITFORIT_end_ts=$(date +%s)
-            echoerr "$WAITFORIT_cmdname: $WAITFORIT_HOST:$WAITFORIT_PORT is available after $((WAITFORIT_end_ts - WAITFORIT_start_ts)) seconds"
+            echoout "$WAITFORIT_cmdname: $WAITFORIT_HOST:$WAITFORIT_PORT is available after $((WAITFORIT_end_ts - WAITFORIT_start_ts)) seconds"
             break
         fi
         sleep 1
