@@ -1,0 +1,5 @@
+# Ignore everything
+*
+
+# Allow files and directories
+!/wait-for-it.sh
